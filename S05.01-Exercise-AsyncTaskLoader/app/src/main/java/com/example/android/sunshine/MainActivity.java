@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements
         if (id == R.id.action_refresh) {
             mForecastAdapter.setWeatherData(null);
             mLoadingIndicator.setVisibility(View.VISIBLE);
-            getLoaderManager().getLoader(ID_WEATHER_LOADER).forceLoad();
+            getLoaderManager().restartLoader(ID_WEATHER_LOADER, null, this);
             return true;
         }
 
