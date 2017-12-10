@@ -111,68 +111,6 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
         loadWeatherData();
     }
 
-    /**
-     * This method will get the user's preferred location for weather, and then tell some
-     * background method to get the weather data in the background.
-     */
-    private void loadWeatherData() {
-        showWeatherDataView();
-
-        String location = SunshinePreferences.getPreferredWeatherLocation(this);
-        Bundle bundle = new Bundle();
-        bundle.putString(ATL_KEY_WEATHER_REQUEST_URL, location);
-        getLoaderManager().initLoader(ID_WEATHER_LOADER, bundle, this);
-        Log.d(TAG, "Loader initialized with location "+location);
-        getLoaderManager().getLoader(ID_WEATHER_LOADER).startLoading();
-        Log.d(TAG, "Loader has been started.");
-        getLoaderManager().getLoader(ID_WEATHER_LOADER).forceLoad();
-        Log.d(TAG, "Loader has been forced to load.");
-        //new FetchWeatherTask().execute(location);
-    }
-
-    /**
-     * This method is overridden by our MainActivity class in order to handle RecyclerView item
-     * clicks.
-     *
-     * @param weatherForDay The weather for the day that was clicked
-     */
-    @Override
-    public void onClick(String weatherForDay) {
-        Context context = this;
-        Class destinationClass = DetailActivity.class;
-        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
-        startActivity(intentToStartDetailActivity);
-    }
-
-    /**
-     * This method will make the View for the weather data visible and
-     * hide the error message.
-     * <p>
-     * Since it is okay to redundantly set the visibility of a View, we don't
-     * need to check whether each view is currently visible or invisible.
-     */
-    private void showWeatherDataView() {
-        /* First, make sure the error is invisible */
-        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
-        /* Then, make sure the weather data is visible */
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * This method will make the error message visible and hide the weather
-     * View.
-     * <p>
-     * Since it is okay to redundantly set the visibility of a View, we don't
-     * need to check whether each view is currently visible or invisible.
-     */
-    private void showErrorMessage() {
-        /* First, hide the currently visible data */
-        mRecyclerView.setVisibility(View.INVISIBLE);
-        /* Then, show the error */
-        mErrorMessageDisplay.setVisibility(View.VISIBLE);
-    }
-
     // COMPLETED (2) Within onCreateLoader, return a new AsyncTaskLoader that looks a lot like the existing FetchWeatherTask.
     // COMPLETED (3) Cache the weather data in a member variable and deliver it in onStartLoading.
     @Override
@@ -243,7 +181,24 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
     }
 
-    // COMPLETED (6) Remove any and all code from MainActivity that references FetchWeatherTask
+    /**
+     * This method will get the user's preferred location for weather, and then tell some
+     * background method to get the weather data in the background.
+     */
+    private void loadWeatherData() {
+        showWeatherDataView();
+
+        String location = SunshinePreferences.getPreferredWeatherLocation(this);
+        Bundle bundle = new Bundle();
+        bundle.putString(ATL_KEY_WEATHER_REQUEST_URL, location);
+        getLoaderManager().initLoader(ID_WEATHER_LOADER, bundle, this);
+        Log.d(TAG, "Loader initialized with location "+location);
+        getLoaderManager().getLoader(ID_WEATHER_LOADER).startLoading();
+        Log.d(TAG, "Loader has been started.");
+        getLoaderManager().getLoader(ID_WEATHER_LOADER).forceLoad();
+        Log.d(TAG, "Loader has been forced to load.");
+        //new FetchWeatherTask().execute(location);
+    }
 
     /**
      * This method uses the URI scheme for showing a location found on a
@@ -269,6 +224,51 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
                     + ", no receiving apps installed!");
         }
     }
+
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * clicks.
+     *
+     * @param weatherForDay The weather for the day that was clicked
+     */
+    @Override
+    public void onClick(String weatherForDay) {
+        Context context = this;
+        Class destinationClass = DetailActivity.class;
+        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
+        startActivity(intentToStartDetailActivity);
+    }
+
+    /**
+     * This method will make the View for the weather data visible and
+     * hide the error message.
+     * <p>
+     * Since it is okay to redundantly set the visibility of a View, we don't
+     * need to check whether each view is currently visible or invisible.
+     */
+    private void showWeatherDataView() {
+        /* First, make sure the error is invisible */
+        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+        /* Then, make sure the weather data is visible */
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * This method will make the error message visible and hide the weather
+     * View.
+     * <p>
+     * Since it is okay to redundantly set the visibility of a View, we don't
+     * need to check whether each view is currently visible or invisible.
+     */
+    private void showErrorMessage() {
+        /* First, hide the currently visible data */
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        /* Then, show the error */
+        mErrorMessageDisplay.setVisibility(View.VISIBLE);
+    }
+
+    // COMPLETED (6) Remove any and all code from MainActivity that references FetchWeatherTask
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
