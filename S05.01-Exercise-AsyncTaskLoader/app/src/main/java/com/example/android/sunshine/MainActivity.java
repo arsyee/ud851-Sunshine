@@ -16,13 +16,13 @@
 package com.example.android.sunshine;
 
 import android.annotation.SuppressLint;
-import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
+import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
+import android.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,11 +44,11 @@ import org.json.JSONException;
 import java.net.URL;
 
 // COMPLETED (1) Implement the proper LoaderCallbacks interface and the methods of that interface
-public class MainActivity extends AppCompatActivity implements ForecastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<String> {
+public class MainActivity extends AppCompatActivity implements
+		ForecastAdapterOnClickHandler,
+		LoaderManager.LoaderCallbacks<String> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String ATL_KEY_WEATHER_REQUEST_URL = "ATL_KEY_WEATHER_REQUEST_URL";
-    private static final int ID_WEATHER_LOADER = 53;
 
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecastAdapter;
@@ -56,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
     private TextView mErrorMessageDisplay;
 
     private ProgressBar mLoadingIndicator;
+    private static final String ATL_KEY_WEATHER_REQUEST_URL = "ATL_KEY_WEATHER_REQUEST_URL";
+    private static final int ID_WEATHER_LOADER = 53;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +121,14 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
         @SuppressLint("StaticFieldLeak") Loader<String> loader = new AsyncTaskLoader<String>(this) {
             private String jsonWeatherResponse = null;
 
+            @Override
+            protected void onStartLoading() {
+                mLoadingIndicator.setVisibility(View.VISIBLE);
+                Log.d(TAG,"AsyncTaskLoader.onStartLoading called");
+                super.onStartLoading();
+                // deliverResult(jsonWeatherResponse);
+            }
+
             // original: protected String[] doInBackground(String... params)
             @Override
             public String loadInBackground() {
@@ -143,13 +153,6 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
                 }
             }
 
-            @Override
-            protected void onStartLoading() {
-                mLoadingIndicator.setVisibility(View.VISIBLE);
-                Log.d(TAG,"AsyncTaskLoader.onStartLoading called");
-                super.onStartLoading();
-                // deliverResult(jsonWeatherResponse);
-            }
         };
         return loader;
     }
