@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -251,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
      * map. This super-handy intent is detailed in the "Common Intents"
      * page of Android's developer site:
      *
-     * @see <a"http://developer.android.com/guide/components/intents-common.html#Maps">
+     * @see <a href="http://developer.android.com/guide/components/intents-common.html#Maps">
      *
      * Hint: Hold Command on Mac or Control on Windows and click that link
      * to automagically open the Common Intents page
