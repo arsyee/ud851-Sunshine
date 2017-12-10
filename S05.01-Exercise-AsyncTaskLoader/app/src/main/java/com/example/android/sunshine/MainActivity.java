@@ -111,18 +111,15 @@ public class MainActivity extends AppCompatActivity implements
 
         // COMPLETED (7) Remove the code for the AsyncTask and initialize the AsyncTaskLoader
         /* Once all of our views are setup, we can load the weather data. */
-        String location = SunshinePreferences.getPreferredWeatherLocation(this);
-        Bundle bundle = new Bundle();
-        bundle.putString(ATL_KEY_WEATHER_REQUEST_URL, location);
-        Log.d(tag(), "Initializing new loader with location: "+location);
-        getLoaderManager().initLoader(ID_WEATHER_LOADER, bundle, this);
+        Log.d(tag(), "Initializing new loader");
+        getLoaderManager().initLoader(ID_WEATHER_LOADER, null, this);
         Log.d(tag(), "Loader initialized");
     }
 
     // COMPLETED (2) Within onCreateLoader, return a new AsyncTaskLoader that looks a lot like the existing FetchWeatherTask.
     // COMPLETED (3) Cache the weather data in a member variable and deliver it in onStartLoading.
     @Override
-    public Loader<String> onCreateLoader(int id, final Bundle args) {
+    public Loader<String> onCreateLoader(int id, Bundle args) {
         Log.d(tag(),"onCreateLoader called");
         // TODO (8) Make Loader class static instead of @SuppressLint
         @SuppressLint("StaticFieldLeak") Loader<String> loader = new AsyncTaskLoader<String>(this) {
@@ -141,12 +138,8 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public String loadInBackground() {
                 Log.d(tag(),"AsyncTaskLoader.loadInBackground called");
-            /* If there's no zip code, there's nothing to look up. */
-                if (!args.containsKey(ATL_KEY_WEATHER_REQUEST_URL)) {
-                    return null;
-                }
 
-                String location = args.getString(ATL_KEY_WEATHER_REQUEST_URL);
+                String location = SunshinePreferences.getPreferredWeatherLocation(MainActivity.this);
                 URL weatherRequestUrl = NetworkUtils.buildUrl(location);
 
                 try {
