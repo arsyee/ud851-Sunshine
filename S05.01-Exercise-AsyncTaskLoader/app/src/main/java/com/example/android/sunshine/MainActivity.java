@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
             @Override
             protected void onStartLoading() {
+                mLoadingIndicator.setVisibility(View.VISIBLE);
                 Log.d(TAG,"AsyncTaskLoader.onStartLoading called");
                 super.onStartLoading();
                 // deliverResult(jsonWeatherResponse);
