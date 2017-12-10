@@ -15,7 +15,6 @@
  */
 package com.example.android.sunshine;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -49,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements
 		LoaderManager.LoaderCallbacks<String> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private final String tag() { return TAG+" ("+Thread.currentThread().getId()+")"; }
+    private String tag() { return TAG+" ("+Thread.currentThread().getId()+")"; }
 
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecastAdapter;
@@ -112,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements
         // COMPLETED (7) Remove the code for the AsyncTask and initialize the AsyncTaskLoader
         /* Once all of our views are setup, we can load the weather data. */
         Log.d(tag(), "Initializing new loader");
+        mLoadingIndicator.setVisibility(View.VISIBLE);
         getLoaderManager().initLoader(ID_WEATHER_LOADER, null, this);
         Log.d(tag(), "Loader initialized");
     }
@@ -121,43 +121,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public Loader<String> onCreateLoader(int id, Bundle args) {
         Log.d(tag(),"onCreateLoader called");
-        // TODO (8) Make Loader class static instead of @SuppressLint
-        @SuppressLint("StaticFieldLeak") Loader<String> loader = new AsyncTaskLoader<String>(this) {
-            private String jsonWeatherResponse = null;
-
-            @Override
-            protected void onStartLoading() {
-                Log.d(tag(),"AsyncTaskLoader.onStartLoading called "+Thread.currentThread().getId());
-                if (jsonWeatherResponse != null) {
-                    deliverResult(jsonWeatherResponse);
-                } else {
-                    mLoadingIndicator.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
-            }
-
-            // original: protected String[] doInBackground(String... params)
-            @Override
-            public String loadInBackground() {
-                Log.d(tag(),"AsyncTaskLoader.loadInBackground called");
-
-                String location = SunshinePreferences.getPreferredWeatherLocation(MainActivity.this);
-                URL weatherRequestUrl = NetworkUtils.buildUrl(location);
-
-                try {
-                    jsonWeatherResponse = NetworkUtils
-                            .getResponseFromHttpUrl(weatherRequestUrl);
-                    // Log.d(tag(), "HTTP response: "+jsonWeatherResponse);
-                    return jsonWeatherResponse;
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-        };
-        return loader;
+        // COMPLETED (8) Make Loader class static instead of @SuppressLint
+        return new StringAsyncTaskLoader(this);
     }
 
     // COMPLETED (4) When the load is finished, show either the data or an error message if there is no data
@@ -274,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements
         // COMPLETED (5) Refactor the refresh functionality to work with our AsyncTaskLoader
         if (id == R.id.action_refresh) {
             mForecastAdapter.setWeatherData(null);
+            mLoadingIndicator.setVisibility(View.VISIBLE);
             getLoaderManager().getLoader(ID_WEATHER_LOADER).forceLoad();
             return true;
         }
@@ -284,5 +250,47 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private static class StringAsyncTaskLoader extends AsyncTaskLoader<String> {
+        private static final String TAG = StringAsyncTaskLoader.class.getSimpleName();
+        private String tag() { return TAG+" ("+Thread.currentThread().getId()+")"; }
+
+        private String jsonWeatherResponse = null;
+
+        StringAsyncTaskLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onStartLoading() {
+            Log.d(tag(),"AsyncTaskLoader.onStartLoading called "+Thread.currentThread().getId());
+            if (jsonWeatherResponse != null) {
+                deliverResult(jsonWeatherResponse);
+            } else {
+                forceLoad();
+            }
+        }
+
+        // original: protected String[] doInBackground(String... params)
+        @Override
+        public String loadInBackground() {
+            Log.d(tag(),"AsyncTaskLoader.loadInBackground called");
+
+            String location = SunshinePreferences.getPreferredWeatherLocation(this.getContext());
+            URL weatherRequestUrl = NetworkUtils.buildUrl(location);
+
+            try {
+                jsonWeatherResponse = NetworkUtils
+                        .getResponseFromHttpUrl(weatherRequestUrl);
+                // Log.d(tag(), "HTTP response: "+jsonWeatherResponse);
+                return jsonWeatherResponse;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
     }
 }
