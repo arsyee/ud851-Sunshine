@@ -127,11 +127,13 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             protected void onStartLoading() {
-                mLoadingIndicator.setVisibility(View.VISIBLE);
                 Log.d(tag(),"AsyncTaskLoader.onStartLoading called "+Thread.currentThread().getId());
-                super.onStartLoading();
-                forceLoad();
-                // deliverResult(jsonWeatherResponse);
+                if (jsonWeatherResponse != null) {
+                    deliverResult(jsonWeatherResponse);
+                } else {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
             }
 
             // original: protected String[] doInBackground(String... params)
