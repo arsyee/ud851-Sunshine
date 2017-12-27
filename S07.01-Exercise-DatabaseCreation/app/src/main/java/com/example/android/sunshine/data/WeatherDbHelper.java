@@ -15,19 +15,52 @@
  */
 package com.example.android.sunshine.data;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 /**
  * Manages a local database for weather data.
  */
-// TODO (11) Extend SQLiteOpenHelper from WeatherDbHelper
-public class WeatherDbHelper {
+// COMPLETED (11) Extend SQLiteOpenHelper from WeatherDbHelper
+public class WeatherDbHelper extends SQLiteOpenHelper {
 
-//  TODO (12) Create a public static final String called DATABASE_NAME with value "weather.db"
+    public static final String TAG = WeatherDbHelper.class.getSimpleName();
 
-//  TODO (13) Create a private static final int called DATABASE_VERSION and set it to 1
+    //  COMPLETED (12) Create a public static final String called DATABASE_NAME with value "weather.db"
+    public static final String DATABASE_NAME = "weather.db";
 
-//  TODO (14) Create a constructor that accepts a context and call through to the superclass constructor
+    //  COMPLETED (13) Create a private static final int called DATABASE_VERSION and set it to 1
+    private static final int DATABASE_VERSION = 1;
 
-//  TODO (15) Override onCreate and create the weather table from within it
+    //  COMPLETED (14) Create a constructor that accepts a context and call through to the superclass constructor
+    public WeatherDbHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
 
-//  TODO (16) Override onUpgrade, but don't do anything within it yet
+    //  COMPLETED (15) Override onCreate and create the weather table from within it
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String sqlQuery = "CREATE TABLE " + WeatherContract.WeatherEntry.TABLE_NAME + "(" +
+                WeatherContract.WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                WeatherContract.WeatherEntry.COLUMN_DATE + " DATE NOT NULL, " +
+                WeatherContract.WeatherEntry.COLUMN_WEATHER_ID + " INTEGER NOT NULL, " +
+                WeatherContract.WeatherEntry.COLUMN_MIN_TEMP + " INTEGER NOT NULL, " +
+                WeatherContract.WeatherEntry.COLUMN_MAX_TEMP + " INTEGER NOT NULL, " +
+                WeatherContract.WeatherEntry.COLUMN_HUMIDITY + " INTEGER NOT NULL, " +
+                WeatherContract.WeatherEntry.COLUMN_PRESSURE + " INTEGER NOT NULL, " +
+                WeatherContract.WeatherEntry.COLUMN_WIND_SPEED + " INTEGER NOT NULL, " +
+                WeatherContract.WeatherEntry.COLUMN_DEGREES + " INTEGER NOT NULL" +
+                ");";
+        Log.d(TAG, "onCreate: " + sqlQuery);
+        db.execSQL(sqlQuery);
+    }
+
+    //  COMPLETED (16) Override onUpgrade, but don't do anything within it yet
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.i(TAG, "onUpgrade called " + oldVersion + " -> " + newVersion);
+    }
+
 }
