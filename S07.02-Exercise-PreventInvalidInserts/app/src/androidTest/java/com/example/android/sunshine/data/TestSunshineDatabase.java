@@ -339,7 +339,7 @@ public class TestSunshineDatabase {
 
         testInsertSingleRecordIntoWeatherTable();
 
-        dbHelper.onUpgrade(database, 13, 14);
+        dbHelper.onUpgrade(database, 1, 2);
 
         /*
          * This Cursor will contain the names of each table in our database and we will use it to
