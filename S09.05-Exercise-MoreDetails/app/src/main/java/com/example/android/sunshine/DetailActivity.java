@@ -34,6 +34,8 @@ import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
+import java.util.Locale;
+
 public class DetailActivity extends AppCompatActivity
 //      COMPLETED (21) Implement LoaderManager.LoaderCallbacks<Cursor>
                          implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -183,16 +185,27 @@ public class DetailActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Log.d(TAG, "onLoadFinished entered: " + cursor.getPosition() + "/" + cursor.getCount());
+//      COMPLETED (25) Check before doing anything that the Cursor has valid data
+        if (cursor == null || cursor.getCount() != 1) throw new IllegalArgumentException(cursor.toString());
         cursor.moveToFirst();
-//      TODO (25) Check before doing anything that the Cursor has valid data
-//      TODO (26) Display a readable data string
-//      TODO (27) Display the weather description (using SunshineWeatherUtils)
-        tvDescription.setText(SunshineWeatherUtils.getStringForWeatherCondition(getApplicationContext(), cursor.getInt(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID))));
-//      TODO (28) Display the high temperature
-//      TODO (29) Display the low temperature
-//      TODO (30) Display the humidity
-//      TODO (31) Display the wind speed and direction
-//      TODO (32) Display the pressure
+//      COMPLETED (26) Display a readable date string
+        tvDate.setText(SunshineDateUtils.getFriendlyDateString(this, cursor.getLong(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE)), true));
+//      COMPLETED (27) Display the weather description (using SunshineWeatherUtils)
+        tvDescription.setText(SunshineWeatherUtils.getStringForWeatherCondition(this, cursor.getInt(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID))));
+//      COMPLETED (28) Display the high temperature
+        tvHighTemperature.setText(SunshineWeatherUtils.formatTemperature(this, cursor.getDouble(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP))));
+//      COMPLETED (29) Display the low temperature
+        tvLowTemperature.setText(SunshineWeatherUtils.formatTemperature(this, cursor.getDouble(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP))));
+//      COMPLETED (30) Display the humidity
+        int humidity = cursor.getInt(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_HUMIDITY));
+        tvHumidity.setText(String.format(Locale.getDefault(),"%d%%", humidity));
+//      COMPLETED (31) Display the wind speed and direction
+        tvWind.setText(SunshineWeatherUtils.getFormattedWind(this,
+                cursor.getFloat(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED)),
+                cursor.getFloat(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DEGREES))));
+//      COMPLETED (32) Display the pressure
+        double pressure = cursor.getDouble(cursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_PRESSURE));
+        tvPressure.setText(String.format(Locale.getDefault(), "%.2f hPa", pressure));
 //      COMPLETED (33) Store a forecast summary in mForecastSummary
         // pass, I already receive it
     }
