@@ -25,6 +25,8 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.example.android.sunshine.utilities.SunshineDateUtils;
+
 /**
  * This class serves as the ContentProvider for all of Sunshine's data. This class allows us to
  * bulkInsert data, query data, and delete data.
@@ -149,6 +151,13 @@ public class WeatherProvider extends ContentProvider {
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
+                        // added extra check as per solution video
+                        long weatherDate =
+                                value.getAsLong(WeatherContract.WeatherEntry.COLUMN_DATE);
+                        if (!SunshineDateUtils.isDateNormalized(weatherDate)) {
+                            throw new IllegalArgumentException("Date must be normalized to insert");
+                        }
+
                         long id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
                         if (id == -1) {
                             throw new SQLiteException("Couldn't insert value " + value);
@@ -156,17 +165,15 @@ public class WeatherProvider extends ContentProvider {
                         result++;
                     }
                     db.setTransactionSuccessful();
-                } catch (SQLiteException e) {
-                    result = 0;
+                // if I don't catch the exception, it will be propageted, so no wrong result count will be returned
                 } finally {
                     db.endTransaction();
-                    getContext().getContentResolver().notifyChange(uri, null);
-                    return result;
                 }
-            case CODE_WEATHER_WITH_DATE:
-                throw new UnsupportedOperationException(uri.toString());
+                getContext().getContentResolver().notifyChange(uri, null);
+                return result;
         }
 //          COMPLETED (4) If the URI does match match CODE_WEATHER, return the super implementation of bulkInsert
+        // super just calls insert() one-by-one, so it will throw an exception anyway, if uri is wrong
         return super.bulkInsert(uri, values);
     }
 
