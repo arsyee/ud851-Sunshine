@@ -18,12 +18,14 @@ package com.example.android.sunshine;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.sunshine.data.WeatherContract;
+import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
 import java.util.StringJoiner;
@@ -34,6 +36,7 @@ import java.util.StringJoiner;
  */
 class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapterViewHolder> {
 
+    private static final String TAG = ForecastAdapter.class.getSimpleName();
     //  COMPLETED (14) Remove the mWeatherData declaration and the swapCursor method
     //  COMPLETED (1) Declare a private final Context field called mContext
     private final Context mContext;
@@ -104,9 +107,19 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastAdapt
 //      COMPLETED (5) Delete the current body of onBindViewHolder
 //      COMPLETED (6) Move the cursor to the appropriate position
         mCursor.moveToPosition(position);
-//      TODO (7) Generate a weather summary with the date, description, high and low
+//      COMPLETED (7) Generate a weather summary with the date, description, high and low
         StringBuilder builder = new StringBuilder();
+        long rawDate = mCursor.getLong(mCursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE));
+        // TODO fix the date bug
+        Log.d(TAG,rawDate + " converts to " + SunshineDateUtils.getFriendlyDateString(mContext, rawDate, true));
+        builder.append(SunshineDateUtils.getFriendlyDateString(mContext, rawDate, false));
+        builder.append(" - ");
         builder.append(SunshineWeatherUtils.getStringForWeatherCondition(mContext, mCursor.getInt(mCursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID))));
+        builder.append(" - ");
+        double high = mCursor.getDouble(mCursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP));
+        double low = mCursor.getDouble(mCursor.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP));
+        Log.d(TAG, "Temperatures: " + low + " - " + high);
+        builder.append(SunshineWeatherUtils.formatHighLows(mContext, high, low));
         String weatherForThisDay = builder.toString();
 //      COMPLETED (8) Display the summary that you created above
         forecastAdapterViewHolder.weatherSummary.setText(weatherForThisDay);
