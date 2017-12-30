@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements
      * Please note that 44 was chosen arbitrarily. You can use whatever number you like, so long as
      * it is unique and consistent.
      */
-    private static final int ID_FORECAST_LOADER = 44;
+    private static final int ID_FORECAST_LOADER = 100;
 
     private ForecastAdapter mForecastAdapter;
     private RecyclerView mRecyclerView;
@@ -258,19 +258,22 @@ public class MainActivity extends AppCompatActivity implements
         mForecastAdapter.swapCursor(null);
     }
 
-    //  TODO (38) Refactor onClick to accept a long instead of a String as its parameter
+    //  COMPLETED (38) Refactor onClick to accept a long instead of a String as its parameter
     /**
      * This method is for responding to clicks from our list.
      *
-     * @param weatherForDay String describing weather details for a particular day
+     * @param id of the day
      */
     @Override
-    public void onClick(String weatherForDay) {
-//      TODO (39) Refactor onClick to build a URI for the clicked date and and pass it with the Intent using setData
+    public void onClick(long id, String weatherForDay) {
+//      COMPLETED (39) Refactor onClick to build a URI for the clicked date and and pass it with the Intent using setData
         Context context = this;
         Class destinationClass = DetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
+        Uri uri = WeatherContract.WeatherEntry.CONTENT_URI.buildUpon().appendPath(Long.toString(id)).build();
+        intentToStartDetailActivity.setData(uri);
+        Log.d(TAG, "Starting activity for " + uri.toString());
         startActivity(intentToStartDetailActivity);
     }
 
