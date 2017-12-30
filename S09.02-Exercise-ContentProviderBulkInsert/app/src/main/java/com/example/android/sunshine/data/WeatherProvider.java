@@ -20,6 +20,8 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -122,7 +124,7 @@ public class WeatherProvider extends ContentProvider {
         return true;
     }
 
-//  TODO (1) Implement the bulkInsert method
+//  COMPLETED (1) Implement the bulkInsert method
     /**
      * Handles requests to insert a set of new rows. In Sunshine, we are only going to be
      * inserting multiple rows of data at a time from a weather forecast. There is no use case
@@ -138,13 +140,34 @@ public class WeatherProvider extends ContentProvider {
      */
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
-        throw new RuntimeException("Student, you need to implement the bulkInsert method!");
-
-//          TODO (2) Only perform our implementation of bulkInsert if the URI matches the CODE_WEATHER code
-
-//              TODO (3) Return the number of rows inserted from our implementation of bulkInsert
-
-//          TODO (4) If the URI does match match CODE_WEATHER, return the super implementation of bulkInsert
+//          COMPLETED (2) Only perform our implementation of bulkInsert if the URI matches the CODE_WEATHER code
+        switch (sUriMatcher.match(uri)) {
+            case CODE_WEATHER:
+//              COMPLETED (3) Return the number of rows inserted from our implementation of bulkInsert
+                SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+                int result = 0;
+                db.beginTransaction();
+                try {
+                    for (ContentValues value : values) {
+                        long id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
+                        if (id == -1) {
+                            throw new SQLiteException("Couldn't insert value " + value);
+                        }
+                        result++;
+                    }
+                    db.setTransactionSuccessful();
+                } catch (SQLiteException e) {
+                    result = 0;
+                } finally {
+                    db.endTransaction();
+                    getContext().getContentResolver().notifyChange(uri, null);
+                    return result;
+                }
+            case CODE_WEATHER_WITH_DATE:
+                throw new UnsupportedOperationException(uri.toString());
+        }
+//          COMPLETED (4) If the URI does match match CODE_WEATHER, return the super implementation of bulkInsert
+        return super.bulkInsert(uri, values);
     }
 
     /**
