@@ -28,7 +28,6 @@ import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.SunshineDateUtils;
 import com.example.android.sunshine.utilities.SunshineWeatherUtils;
 
-import java.util.StringJoiner;
 
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts

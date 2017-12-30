@@ -21,7 +21,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -37,10 +36,6 @@ import android.widget.ProgressBar;
 import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.FakeDataUtils;
-import com.example.android.sunshine.utilities.NetworkUtils;
-import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
-
-import java.net.URL;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -51,9 +46,17 @@ public class MainActivity extends AppCompatActivity implements
 
     private final String TAG = MainActivity.class.getSimpleName();
 
-//  TODO (16) Create a String array containing the names of the desired data columns from our ContentProvider
+//  COMPLETED (16) Create a String array containing the names of the desired data columns from our ContentProvider
+    public static final String[] MAIN_PROJECTION = new String[]{
+            WeatherContract.WeatherEntry._ID,
+            WeatherContract.WeatherEntry.COLUMN_DATE,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+            WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
+    };
 
-//  TODO (17) Create constant int values representing each column name's position above
+//  COMPLETED (17) Create constant int values representing each column name's position above
+    // I have no idea why would I do this. I can get the clomun indexes from the Cursor.
 
 //  COMPLETED (37) Remove the error TextView
 
@@ -143,7 +146,8 @@ public class MainActivity extends AppCompatActivity implements
         /* Setting the adapter attaches it to the RecyclerView in our layout. */
         mRecyclerView.setAdapter(mForecastAdapter);
 
-//      TODO (18) Call the showLoading method
+//      COMPLETED (18) Call the showLoading method
+        showLoading();
 
         /*
          * Ensures a loader is initialized and active. If the loader doesn't already exist, one is
@@ -154,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-//      COMPLETED (19) Remove the statement that registers Mainactivity as a preference change listener
+//      COMPLETED (19) Remove the statement that registers MainActivity as a preference change listener
     }
 
     /**
@@ -200,9 +204,8 @@ public class MainActivity extends AppCompatActivity implements
 //      COMPLETED (25) Remove the deliverResult method declaration
 //          COMPLETED (22) If the loader requested is our forecast loader, return the appropriate CursorLoader
         Uri uri = WeatherContract.WeatherEntry.CONTENT_URI;
-        String[] projection = null;
         String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE;
-        return new CursorLoader(this, uri, projection, null, null, sortOrder);
+        return new CursorLoader(this, uri, MAIN_PROJECTION, null, null, sortOrder);
     }
 
 //  COMPLETED (26) Change onLoadFinished parameter to a Loader<Cursor> instead of a Loader<String[]>
@@ -216,9 +219,11 @@ public class MainActivity extends AppCompatActivity implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         //      COMPLETED (27) Remove the previous body of onLoadFinished
         //      COMPLETED (28) Call mForecastAdapter's swapCursor method and pass in the new Cursor
-        //      TODO (29) If mPosition equals RecyclerView.NO_POSITION, set it to 0
-        //      TODO (30) Smooth scroll the RecyclerView to mPosition
-        //      TODO (31) If the Cursor's size is not equal to 0, call showWeatherDataView
+        //      COMPLETED (29) If mPosition equals RecyclerView.NO_POSITION, set it to 0
+        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+        //      COMPLETED (30) Smooth scroll the RecyclerView to mPosition
+        mRecyclerView.smoothScrollToPosition(mPosition);
+        //      COMPLETED (31) If the Cursor's size is not equal to 0, call showWeatherDataView
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mForecastAdapter.swapCursor(cursor);
         if (null == cursor) {
@@ -276,7 +281,11 @@ public class MainActivity extends AppCompatActivity implements
 
 //  COMPLETED (33) Delete showErrorMessage
 
-//  TODO (34) Create a method called showLoading that shows the loading indicator and hides the data
+//  COMPLETED (34) Create a method called showLoading that shows the loading indicator and hides the data
+    private void showLoading() {
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
+    }
 
     /**
      * This is where we inflate and set up the menu for this Activity.
