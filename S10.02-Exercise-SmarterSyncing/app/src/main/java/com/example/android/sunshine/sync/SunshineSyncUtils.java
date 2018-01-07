@@ -19,6 +19,7 @@ import android.content.ContentProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.example.android.sunshine.data.WeatherContract;
@@ -39,15 +40,22 @@ public class SunshineSyncUtils {
         //  COMPLETED (4) If the method body is executed, set sInitialized to true
         sInitialized = true;
         //  COMPLETED (5) Check to see if our weather ContentProvider is empty
-        Cursor weatherCache = context.getContentResolver()
-                .query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
-        if (weatherCache == null || weatherCache.getCount() == 0) {
-            //  COMPLETED (6) If it is empty or we have a null Cursor, sync the weather now!
-            startImmediateSync(context);
-        }
-        if (weatherCache != null) {
-            weatherCache.close();
-        }
+        new AsyncTask() {
+
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                Cursor weatherCache = context.getContentResolver()
+                        .query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
+                if (weatherCache == null || weatherCache.getCount() == 0) {
+                    //  COMPLETED (6) If it is empty or we have a null Cursor, sync the weather now!
+                    startImmediateSync(context);
+                }
+                if (weatherCache != null) {
+                    weatherCache.close();
+                }
+                return null;
+            }
+        }.execute();
     }
 
     /**
